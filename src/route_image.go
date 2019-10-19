@@ -41,12 +41,21 @@ func routeAddImage(c *gin.Context) {
 		// Si c'est un son, on balance
 		if contentType == "audio/wave" {
 			extension = ".wav"
-			log.Println("Going in")
 			isNew, idMedia = startCompareSound("temp/" + file.Filename)
 			fmt.Println(isNew, idMedia)
-		} else if contentType == "image/png" || contentType == "image/jpeg" {
+		} else if contentType == "image/png" {
+			// Image treatment
+			log.Println("Going in")
+			fmt.Println(file.Filename)
 			extension = ".png"
-			// Guillaume intervient
+			isNew, idMedia = startCompareImage("temp/" + file.Filename)
+			isNew = !isNew
+			fmt.Println(isNew, idMedia)
+		} else if contentType == "image/jpg" || contentType == "image/jpeg" {
+			extension = ".jpg"
+			isNew, idMedia = startCompareImage("temp/" + file.Filename)
+			isNew = !isNew
+			fmt.Println(isNew, idMedia)
 		} else {
 			log.Println("Holy cucumber... What the fucker ?")
 			extension = ".fuck"
@@ -67,7 +76,7 @@ func routeAddImage(c *gin.Context) {
 		}
 
 		// Make JSON
-		JSONs = append(JSONs, gin.H{file.Filename: idMedia})
+		JSONs = append(JSONs, gin.H{file.Filename: "http://localhost:8080/" + idMedia})
 	}
 
 	// Return Links
