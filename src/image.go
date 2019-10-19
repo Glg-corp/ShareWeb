@@ -90,6 +90,19 @@ func compareImage(path1 string, path2 string) bool {
 		os.Exit(1)
 	}
 
+	// If the two images don't have the same scale
+	if float64(len(pixelsImage1)) / float64(len(pixelsImage1[0])) != float64(len(pixelsImage2)) / float64(len(pixelsImage2[0])) {
+		return false
+	} else {
+
+		// If the two images have the same scale but are not the same size
+		if len(pixelsImage1) != len(pixelsImage2) {
+			//TODO
+			return false
+		}
+	}
+
+	// The two images are the same size
 	var nbPixelsEquivalent int
 	var counter int
 	width := len(pixelsImage1[0])
@@ -109,6 +122,7 @@ func compareImage(path1 string, path2 string) bool {
 
 	result := float64(nbPixelsEquivalent) / float64(counter) * 100 * 100
 	fmt.Println("The two images have a resemblance of", math.Round(result)/100, "%")
+
 
 	if result > 0.95 {
 		return true
