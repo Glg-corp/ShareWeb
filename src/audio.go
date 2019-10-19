@@ -38,7 +38,6 @@ func startCompareSound(path string) (bool, string) {
 		Path:      path}
 
 	fileID := addSound(sound)
-	log.Println("Vincent content")
 	log.Println(strconv.Itoa(int(fileID)))
 	return true, strconv.Itoa(int(fileID))
 }

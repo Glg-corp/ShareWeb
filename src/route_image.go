@@ -19,7 +19,6 @@ func routeAddImage(c *gin.Context) {
 	// Get data list
 	form, _ := c.MultipartForm()
 	files := form.File["CONTENT"]
-
 	//Treat each file
 	for _, file := range files {
 
