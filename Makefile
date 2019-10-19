@@ -6,3 +6,4 @@ install:
 	go get -v github.com/gin-gonic/gin
 	go get -v github.com/jinzhu/gorm
 	go get -v github.com/jinzhu/gorm/dialects/sqlite
+	go get -v github.com/youpy/go-wav
