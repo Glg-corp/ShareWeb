@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/youpy/go-wav"
@@ -71,7 +72,6 @@ func compareSounds(samples1 []wav.Sample, path2 string) bool {
 	}
 
 	for i := 0; i < myMin(len(samples1), len(samples2)); i++ {
-		fmt.Println("Comparing", samples1[i], "and", samples2[i])
 		if cleverCompare(samples1[i].Values[0], samples2[i].Values[0], 32) && cleverCompare(samples1[i].Values[1], samples2[i].Values[1], 32) {
 
 		} else {
