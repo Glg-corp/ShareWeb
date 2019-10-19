@@ -28,7 +28,6 @@ type Sound struct {
 	Mono      bool
 }
 
-
 // init the database
 func initDB() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -114,15 +113,7 @@ func getImages(color string, size int32) []Image {
 // add a new image
 func addImage(image Image) int32 {
 
-	found := true
-
-	// generate an id
-	var id int32
-	for found {
-		id = int32(rand.Intn(1000000-500000) + 500000)
-		found = doesImageExist(id)
-		log.Println(id)
-	}
+	id := getID("image")
 
 	// save the image with that id
 	image.ID = id
@@ -135,16 +126,7 @@ func addImage(image Image) int32 {
 // addSound
 func addSound(sound Sound) int32 {
 
-	found := true
-
-	// generate an id
-	var id int32
-	for found {
-
-		id = int32(rand.Intn(1000000-500000) + 500000)
-		found = doesSoundExist(id)
-		log.Println(id)
-	}
+	id := getID("sound")
 
 	// save the image with that id
 	sound.ID = id
@@ -178,6 +160,28 @@ func getSound(id int32) Sound {
 	return sound
 }
 
+func getID(mode string) {
+	found := true
+
+	// generate an id
+	var id int32
+	for found {
+
+		id = int32(rand.Intn(1000000-500000) + 500000)
+		if mode == "image" {
+			found = doesImageExist(id)
+		}
+		else if mode == "sound"{
+			found = doesSoundExist(id)
+		}
+		else{
+			panic("invalid mode")
+		}
+		log.Println(id)
+	}
+
+}
+
 func getSounds(nbSamples int32, mono bool) []Sound {
 
 	// get the matching rows
@@ -198,4 +202,12 @@ func getSounds(nbSamples int32, mono bool) []Sound {
 
 	return sounds
 
+}
+
+addExistingImage(image Image){
+	db.Save(&Image)
+}
+
+addExistingSound(sound Sound){
+	db.Save(&Sound)
 }
