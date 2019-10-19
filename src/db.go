@@ -17,6 +17,7 @@ type Image struct {
 	Path  string
 	Color uint32
 	Size  int32
+	Key   string
 }
 
 // sound table struct
@@ -25,6 +26,16 @@ type Sound struct {
 	Path      string
 	NbSamples int32
 	Mono      bool
+	Key       string
+}
+
+// fallback table struct
+type Other struct {
+	ID        int32 `gorm:"primary_key:yes;column:ID"`
+	Path      string
+	Extension string
+	FileSize  int32
+	Key       string
 }
 
 // init the database
@@ -40,11 +51,8 @@ func initDB() {
 	// migrate the table
 	db.AutoMigrate(&Image{})
 	db.AutoMigrate(&Sound{})
-
-
+	db.AutoMigrate(&Other{})
 }
-
-
 
 func getImage(id int32) Image {
 
@@ -159,6 +167,8 @@ func getID(mode string) int32 {
 			found = doesImageExist(id)
 		} else if mode == "sound" {
 			found = doesSoundExist(id)
+		} else if mode == "other" {
+			found = doesOtherExist(id)
 		} else {
 			panic("invalid mode")
 		}
@@ -195,4 +205,55 @@ func addExistingImage(image Image) {
 
 func addExistingSound(sound Sound) {
 	db.Save(&sound)
+}
+
+// ----- others -------
+
+func doesOtherExist(id int32) bool {
+	rows, err := db.Where(&Other{ID: id}).Model(&Other{}).Rows()
+	defer rows.Close()
+	if err != nil {
+		panic(err)
+	}
+	return rows.Next()
+}
+
+func getOthers(extension string, fileSize int32) []Other {
+	// get the matching rows
+	rows, err := db.Where(&Other{Extension: extension, FileSize: fileSize}).Model(&Other{}).Rows()
+	defer rows.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	var others []Other
+
+	// add the lines to the list
+	var other Other
+	for rows.Next() {
+		db.ScanRows(rows, &other)
+		others = append(others, other)
+	}
+
+	return others
+}
+
+func addExistingOther(other Other) {
+	db.Save(&other)
+}
+
+// Security  functions
+
+func isAllowed(mode string, path string, key string) bool {
+	var count int32
+	if mode == "image" {
+		db.Where(&Image{Path: path, Key: key}).Count(&count)
+	} else if mode == "sound" {
+		db.Where(&Sound{Path: path, Key: key}).Count(&count)
+	} else if mode == "other" {
+		db.Where(&Other{Path: path, Key: key}).Count(&count)
+	} else {
+		panic("Invalid mode >:c")
+	}
+	return count == 1
 }
