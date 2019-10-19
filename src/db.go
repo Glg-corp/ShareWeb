@@ -15,7 +15,7 @@ var db *gorm.DB
 type Image struct {
 	ID    int32 `gorm:"primary_key:yes;column:ID"`
 	Path  string
-	Color string
+	Color uint32
 	Size  int32
 }
 
@@ -41,28 +41,10 @@ func initDB() {
 	db.AutoMigrate(&Image{})
 	db.AutoMigrate(&Sound{})
 
-	// get sample values
-	populateDb()
 
 }
 
-// generate sample values for debugging purpose
-func populateDb() {
-	cat := Image{ID: 34567, Path: "./public/cat.jpg", Color: "0000FF", Size: 3}
-	db.Save(&cat)
 
-	cat = Image{ID: 57821, Path: "./public/catze.jpg", Color: "0000FF", Size: 3}
-	db.Save(&cat)
-
-	cat = Image{ID: 19721, Path: "./public/catt.jpg", Color: "000eFF", Size: 3}
-	db.Save(&cat)
-
-	sound := Sound{Path: "./public/piano2.bis.wav", Mono: false, NbSamples: 2048}
-	db.Save(&sound)
-
-	sound = Sound{Path: "./public/piano2.wav", Mono: false, NbSamples: 2048}
-	db.Save(&sound)
-}
 
 func getImage(id int32) Image {
 
@@ -91,7 +73,7 @@ func doesImageExist(id int32) bool {
 	return rows.Next()
 }
 
-func getImages(color string, size int32) []Image {
+func getImages(color uint32, size int32) []Image {
 
 	// array := []Image{}
 
