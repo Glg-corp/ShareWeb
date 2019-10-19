@@ -7,8 +7,9 @@ import (
 
 func main() {
 	initDB()
-	id := addImage(Image{ID: 0, Path: "bob", Color: "FF0000", Size: 0})
-	image := getImage(id)
+	defer db.Close()
+	id := addSound(Sound{Mono: true, NbSamples: 432, ID: 0, Path: "/bob"})
+	image := getSound(id)
 	log.Println(image)
 
 	r := gin.Default()

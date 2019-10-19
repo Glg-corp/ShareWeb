@@ -1,8 +1,8 @@
 package main
 
 import (
-	"math/rand"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -20,6 +20,15 @@ type Image struct {
 	Size  int32
 }
 
+// sound table struct
+type Sound struct {
+	ID        int32 `gorm:"primary_key:yes;column:ID"`
+	Path      string
+	NbSamples int32
+	Mono      bool
+}
+
+
 // init the database
 func initDB() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -32,6 +41,7 @@ func initDB() {
 
 	// migrate the table
 	db.AutoMigrate(&Image{})
+	db.AutoMigrate(&Sound{})
 
 	// get sample values
 	populateDb()
@@ -51,8 +61,8 @@ func populateDb() {
 }
 
 func getImage(id int32) Image {
-	
-	// get the rows 
+
+	// get the rows
 	rows, err := db.Where(&Image{ID: id}).Model(&Image{}).Rows()
 	defer rows.Close()
 	if err != nil {
@@ -113,9 +123,79 @@ func addImage(image Image) int32 {
 		found = doesImageExist(id)
 		log.Println(id)
 	}
-	
+
 	// save the image with that id
 	image.ID = id
 	db.Save(&image)
 	return id
+}
+
+/// --- sound ---
+
+// addSound
+func addSound(sound Sound) int32 {
+
+	found := true
+
+	// generate an id
+	var id int32
+	for found {
+
+		id = int32(rand.Intn(1000000-500000) + 500000)
+		found = doesSoundExist(id)
+		log.Println(id)
+	}
+
+	// save the image with that id
+	sound.ID = id
+	db.Save(&sound)
+	return id
+}
+
+// return a bool if a image exists
+func doesSoundExist(id int32) bool {
+	rows, err := db.Where(&Sound{ID: id}).Model(&Sound{}).Rows()
+	defer rows.Close()
+	if err != nil {
+		panic(err)
+	}
+	return rows.Next()
+}
+
+func getSound(id int32) Sound {
+	// get the rows
+	rows, err := db.Where(&Sound{ID: id}).Model(&Sound{}).Rows()
+	defer rows.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	// return the image
+	var sound Sound
+	if rows.Next() {
+		db.ScanRows(rows, &sound)
+	}
+	return sound
+}
+
+func getSounds(color string, nbSamples int32, mono bool) []Sound {
+
+	// get the matching rows
+	rows, err := db.Where(&Sound{NbSamples: nbSamples, Mono: mono}).Model(&Sound{}).Rows()
+	defer rows.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	var sounds []Sound
+
+	// add images to the list
+	var sound Sound
+	for rows.Next() {
+		db.ScanRows(rows, &sound)
+		sounds = append(sounds, sound)
+	}
+
+	return sounds
+
 }
