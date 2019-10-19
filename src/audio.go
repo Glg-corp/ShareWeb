@@ -9,27 +9,56 @@ import (
 	"github.com/youpy/go-wav"
 )
 
-func compareSounds(path1 string, path2 string) bool {
-	// Parse first file
-	file1, _ := os.Open(path1)
-	reader1 := wav.NewReader(file1)
+func startCompareSound(path string) (bool, string) {
+	// Open file
+	file, _ := os.Open(path)
+	reader := wav.NewReader(file)
+	defer file.Close()
 
+	// On the parsing
+	samples, _ := reader.ReadSamples()
+	nbSamples := len(samples)
+	isStereo := isSoundStereo(samples)
+
+	sounds := getSounds(int32(nbSamples), !isStereo)
+
+	// On va éviter de reparser le premier fichier à chaque fois
+	file1, _ := os.Open(path)
+	reader1 := wav.NewReader(file1)
+	defer file1.Close()
+
+	// Let's parse ce truc
+	samples1, err := reader1.ReadSamples()
+	if err == io.EOF {
+		return false, "impossible to read"
+	}
+
+	// Let's compare all sound with dat sound
+	for _, sound := range sounds {
+		if compareSounds(samples, sound.Path) {
+			// On est bon, on l'a trouvé
+			return true, sound.Path
+		}
+	}
+
+	// Let's build a new son
+	sound := Sound{
+		Mono:      !isStereo,
+		NbSamples: int32(nbSamples),
+		Path:      path}
+
+	return false, path
+}
+
+func compareSounds(samples1 []wav.Sample, path2 string) bool {
 	// Parse second file
 	file2, _ := os.Open(path2)
 	reader2 := wav.NewReader(file2)
 
 	// Close proprement les fichiers
-	defer file1.Close()
 	defer file2.Close()
 
 	// Let's parse ce truc
-	samples1, err := reader1.ReadSamples()
-	if err == io.EOF {
-		return false
-	}
-	log.Println(len(samples1))
-
-	// L'autre truc aussi
 	samples2, err := reader2.ReadSamples()
 	if err == io.EOF {
 		return false
@@ -70,4 +99,13 @@ func abs(value int) int {
 		return -value
 	}
 	return value
+}
+
+func isSoundStereo(samples []wav.Sample) bool {
+	for _, sample := range samples {
+		if sample.Values[0] != sample.Values[1] {
+			return true
+		}
+	}
+	return false
 }
