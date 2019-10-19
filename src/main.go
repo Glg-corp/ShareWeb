@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
