@@ -1,21 +1,14 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-
-	"log"
-
-	"mime/multipart"
-
-	"io"
-
 	"bytes"
-
+	"io"
+	"log"
+	"mime/multipart"
+	"net/http"
 	"os"
 
-	"strconv"
+	"github.com/gin-gonic/gin"
 )
 
 func routeAddImage(c *gin.Context) {
@@ -27,7 +20,7 @@ func routeAddImage(c *gin.Context) {
 	files := form.File["CONTENT"]
 
 	//Treat each file
-	for i, file := range files {
+	for _, file := range files {
 
 		// Store it locally
 		err := c.SaveUploadedFile(file, "temp/"+file.Filename)
@@ -39,9 +32,18 @@ func routeAddImage(c *gin.Context) {
 		contentType := http.DetectContentType(fileheaderToBytes(file))
 		log.Println(contentType)
 
-		// Call treatment functions
-		url := "https://theuselessweb.com/"
-		isPresent := false
+		isNew := false
+		_ = isNew
+		idMedia := "caca.jpg"
+		_ = idMedia
+		// Si c'est un son, on balance
+		if contentType == "audio/wave" {
+			isNew, idMedia = startCompareSound("temp/" + file.Filename)
+		} else if contentType == "image/png" || contentType == "image/jpeg" {
+			// Guillaume intervient
+		} else {
+			log.Println("Holy cucumber... What the fucker ?")
+		}
 
 		// Store data
 		/// Delete temp file
@@ -50,12 +52,13 @@ func routeAddImage(c *gin.Context) {
 			log.Println("Could not delete temp file : " + file.Filename)
 		}
 		/// Save file
-		if !isPresent {
-			c.SaveUploadedFile(file, "public/"+strconv.Itoa(i))
+		if isNew {
+			println("Okay les gus, nouveau fichier")
+			c.SaveUploadedFile(file, "public/"+idMedia)
 		}
 
 		// Make JSON
-		JSONs = append(JSONs, gin.H{file.Filename: url})
+		JSONs = append(JSONs, gin.H{file.Filename: "caca"})
 	}
 
 	// Return Links

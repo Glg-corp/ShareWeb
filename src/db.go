@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"time"
 
@@ -166,7 +165,7 @@ func getSound(id int32) Sound {
 	return sound
 }
 
-func getID(mode string) {
+func getID(mode string) int32 {
 	found := true
 
 	// generate an id
@@ -176,15 +175,13 @@ func getID(mode string) {
 		id = int32(rand.Intn(1000000-500000) + 500000)
 		if mode == "image" {
 			found = doesImageExist(id)
-		}
-		else if mode == "sound"{
+		} else if mode == "sound" {
 			found = doesSoundExist(id)
-		}
-		else{
+		} else {
 			panic("invalid mode")
 		}
-		log.Println(id)
 	}
+	return id
 
 }
 
@@ -210,10 +207,10 @@ func getSounds(nbSamples int32, mono bool) []Sound {
 
 }
 
-addExistingImage(image Image){
-	db.Save(&Image)
+func addExistingImage(image Image) {
+	db.Save(&image)
 }
 
-addExistingSound(sound Sound){
-	db.Save(&Sound)
+func addExistingSound(sound Sound) {
+	db.Save(&sound)
 }

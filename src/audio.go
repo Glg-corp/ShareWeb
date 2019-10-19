@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/youpy/go-wav"
@@ -22,17 +21,6 @@ func startCompareSound(path string) (bool, string) {
 
 	sounds := getSounds(int32(nbSamples), !isStereo)
 
-	// On va éviter de reparser le premier fichier à chaque fois
-	file1, _ := os.Open(path)
-	reader1 := wav.NewReader(file1)
-	defer file1.Close()
-
-	// Let's parse ce truc
-	samples1, err := reader1.ReadSamples()
-	if err == io.EOF {
-		return false, "impossible to read"
-	}
-
 	// Let's compare all sound with dat sound
 	for _, sound := range sounds {
 		if compareSounds(samples, sound.Path) {
@@ -46,6 +34,8 @@ func startCompareSound(path string) (bool, string) {
 		Mono:      !isStereo,
 		NbSamples: int32(nbSamples),
 		Path:      path}
+
+	addSound(sound)
 
 	return false, path
 }
@@ -92,13 +82,6 @@ func myMin(a int, b int) int {
 		return b
 	}
 	return a
-}
-
-func abs(value int) int {
-	if value < 0 {
-		return -value
-	}
-	return value
 }
 
 func isSoundStereo(samples []wav.Sample) bool {
