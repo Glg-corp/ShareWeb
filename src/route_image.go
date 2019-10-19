@@ -1,21 +1,15 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-
-	"log"
-
-	"mime/multipart"
-
-	"io"
-
 	"bytes"
-
+	"fmt"
+	"io"
+	"log"
+	"mime/multipart"
+	"net/http"
 	"os"
 
-	"strconv"
+	"github.com/gin-gonic/gin"
 )
 
 func routeAddImage(c *gin.Context) {
@@ -27,7 +21,7 @@ func routeAddImage(c *gin.Context) {
 	files := form.File["CONTENT"]
 
 	//Treat each file
-	for i, file := range files {
+	for _, file := range files {
 
 		// Store it locally
 		err := c.SaveUploadedFile(file, "temp/"+file.Filename)
@@ -39,9 +33,35 @@ func routeAddImage(c *gin.Context) {
 		contentType := http.DetectContentType(fileheaderToBytes(file))
 		log.Println(contentType)
 
-		// Call treatment functions
-		url := "https://theuselessweb.com/"
-		isPresent := false
+		isNew := false
+		_ = isNew
+		idMedia := "caca.jpg"
+		_ = idMedia
+		extension := ""
+		// Si c'est un son, on balance
+		if contentType == "audio/wave" {
+			extension = ".wav"
+			isNew, idMedia = startCompareSound("temp/" + file.Filename)
+			fmt.Println(isNew, idMedia)
+		} else if contentType == "image/png" {
+			// Image treatment
+			log.Println("Going in")
+			fmt.Println(file.Filename)
+			extension = ".png"
+			isNew, idMedia = startCompareImage("temp/" + file.Filename)
+			isNew = !isNew
+			fmt.Println(isNew, idMedia)
+		} else if contentType == "image/jpg" || contentType == "image/jpeg" {
+			extension = ".jpg"
+			isNew, idMedia = startCompareImage("temp/" + file.Filename)
+			isNew = !isNew
+			fmt.Println(isNew, idMedia)
+		} else {
+			log.Println("Holy cucumber... What the fucker ?")
+			extension = ".fuck"
+		}
+
+		idMedia = idMedia + extension
 
 		// Store data
 		/// Delete temp file
@@ -50,12 +70,13 @@ func routeAddImage(c *gin.Context) {
 			log.Println("Could not delete temp file : " + file.Filename)
 		}
 		/// Save file
-		if !isPresent {
-			c.SaveUploadedFile(file, "public/"+strconv.Itoa(i))
+		if isNew {
+			println("Okay les gus, nouveau fichier")
+			c.SaveUploadedFile(file, "public/"+idMedia)
 		}
 
 		// Make JSON
-		JSONs = append(JSONs, gin.H{file.Filename: url})
+		JSONs = append(JSONs, gin.H{file.Filename: "http://localhost:8080/" + idMedia})
 	}
 
 	// Return Links
