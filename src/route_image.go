@@ -67,7 +67,7 @@ func routeAddImage(c *gin.Context) {
 		}
 
 		// Make JSON
-		JSONs = append(JSONs, gin.H{file.Filename: idMedia})
+		JSONs = append(JSONs, gin.H{file.Filename: "http://localhost:8080/" + idMedia})
 	}
 
 	// Return Links
