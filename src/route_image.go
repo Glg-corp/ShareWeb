@@ -38,6 +38,7 @@ func routeAddImage(c *gin.Context) {
 		_ = idMedia
 		// Si c'est un son, on balance
 		if contentType == "audio/wave" {
+
 			isNew, idMedia = startCompareSound("temp/" + file.Filename)
 			idMedia += ".wav"
 			fmt.Println(isNew, idMedia)

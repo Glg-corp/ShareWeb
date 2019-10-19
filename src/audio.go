@@ -57,7 +57,7 @@ func compareSounds(samples1 []wav.Sample, path2 string) bool {
 	}
 
 	// On check si les deux fichiers ont la même longueur
-	if !(abs(len(samples1)-len(samples2)) < 32) {
+	if !(myAbs(len(samples1)-len(samples2)) < 32) {
 		// La différence est trop grande
 		fmt.Println("Length of sounds are too different.")
 		return false
@@ -76,7 +76,7 @@ func compareSounds(samples1 []wav.Sample, path2 string) bool {
 }
 
 func cleverCompare(a int, b int, marge int) bool {
-	return (abs(a-b) < marge)
+	return (myAbs(a-b) < marge)
 }
 
 func myMin(a int, b int) int {
@@ -84,6 +84,13 @@ func myMin(a int, b int) int {
 		return b
 	}
 	return a
+}
+
+func myAbs(value int) int {
+	if value < 0 {
+		return -value
+	}
+	return value
 }
 
 func isSoundStereo(samples []wav.Sample) bool {

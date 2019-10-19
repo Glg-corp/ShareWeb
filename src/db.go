@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -79,7 +80,7 @@ func doesImageExist(id int32) bool {
 }
 
 func getImages(color uint32, size int32) []Image {
-
+	now := time.Now().UnixNano()
 	// array := []Image{}
 
 	// get the matching rows
@@ -97,6 +98,7 @@ func getImages(color uint32, size int32) []Image {
 		db.ScanRows(rows, &image)
 		images = append(images, image)
 	}
+	fmt.Println("getImages !!! ", time.Now().UnixNano()-now)
 
 	return images
 
@@ -104,12 +106,13 @@ func getImages(color uint32, size int32) []Image {
 
 // add a new image
 func addImage(image Image) int32 {
-
+	now := time.Now().UnixNano()
 	id := getID("image")
 
 	// save the image with that id
 	image.ID = id
 	db.Save(&image)
+	fmt.Println("addImage !!! ", time.Now().UnixNano()-now)
 	return id
 }
 
