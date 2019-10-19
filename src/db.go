@@ -57,6 +57,12 @@ func populateDb() {
 
 	cat = Image{ID: 19721, Path: "./public/catt.jpg", Color: "000eFF", Size: 3}
 	db.Save(&cat)
+
+	sound := Sound{Path: "./public/piano2.bis.wav", Mono: false, NbSamples: 2048}
+	db.Save(&sound)
+
+	sound = Sound{Path: "./public/piano2.wav", Mono: false, NbSamples: 2048}
+	db.Save(&sound)
 }
 
 func getImage(id int32) Image {
