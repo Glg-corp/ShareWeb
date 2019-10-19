@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+    "fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -61,12 +61,18 @@ func startCompareImage(path string) (bool, string) {
 	for i := 0; i < len(images); i++ {
 		exists := compareImage(path, images[i].Path)
 		if exists {
-			return true, images[i].Path
+			return true, strconv.Itoa(int(images[i].ID))
 		}
-	}
+    }
+    
+    id := getID("image")
+    
+    newName := fmt.Sprintf("./public/%d.%s", id, path[len(path)-3:])
+
+    addExistingImage(Image{Path: newName, Color: finalMean, Size: size, ID: id})
 
 	// if gets here, its false
-	return false, path
+	return false, strconv.Itoa(int(id))
 }
 
 func compareImage(path1 string, path2 string) bool {
