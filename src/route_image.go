@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -36,14 +37,22 @@ func routeAddImage(c *gin.Context) {
 		_ = isNew
 		idMedia := "caca.jpg"
 		_ = idMedia
+		extension := ""
 		// Si c'est un son, on balance
 		if contentType == "audio/wave" {
+			extension = ".wav"
+			log.Println("Going in")
 			isNew, idMedia = startCompareSound("temp/" + file.Filename)
+			fmt.Println(isNew, idMedia)
 		} else if contentType == "image/png" || contentType == "image/jpeg" {
+			extension = ".png"
 			// Guillaume intervient
 		} else {
 			log.Println("Holy cucumber... What the fucker ?")
+			extension = ".fuck"
 		}
+
+		idMedia = idMedia + extension
 
 		// Store data
 		/// Delete temp file
@@ -58,7 +67,7 @@ func routeAddImage(c *gin.Context) {
 		}
 
 		// Make JSON
-		JSONs = append(JSONs, gin.H{file.Filename: "caca"})
+		JSONs = append(JSONs, gin.H{file.Filename: idMedia})
 	}
 
 	// Return Links

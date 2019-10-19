@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"strconv"
 
 	"github.com/youpy/go-wav"
 )
@@ -25,7 +27,7 @@ func startCompareSound(path string) (bool, string) {
 	for _, sound := range sounds {
 		if compareSounds(samples, sound.Path) {
 			// On est bon, on l'a trouvé
-			return true, sound.Path
+			return false, strconv.Itoa(int(sound.ID))
 		}
 	}
 
@@ -35,9 +37,10 @@ func startCompareSound(path string) (bool, string) {
 		NbSamples: int32(nbSamples),
 		Path:      path}
 
-	addSound(sound)
-
-	return false, path
+	fileID := addSound(sound)
+	log.Println("Vincent content")
+	log.Println(strconv.Itoa(int(fileID)))
+	return true, strconv.Itoa(int(fileID))
 }
 
 func compareSounds(samples1 []wav.Sample, path2 string) bool {
