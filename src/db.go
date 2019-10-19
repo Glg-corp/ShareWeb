@@ -178,7 +178,7 @@ func getSound(id int32) Sound {
 	return sound
 }
 
-func getSounds(color string, nbSamples int32, mono bool) []Sound {
+func getSounds(nbSamples int32, mono bool) []Sound {
 
 	// get the matching rows
 	rows, err := db.Where(&Sound{NbSamples: nbSamples, Mono: mono}).Model(&Sound{}).Rows()
