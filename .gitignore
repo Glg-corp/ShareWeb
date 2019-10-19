@@ -2,3 +2,4 @@
 *.db
 temp
 public
+./audio

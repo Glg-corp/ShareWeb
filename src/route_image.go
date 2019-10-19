@@ -36,31 +36,25 @@ func routeAddImage(c *gin.Context) {
 		_ = isNew
 		idMedia := "caca.jpg"
 		_ = idMedia
-		extension := ""
 		// Si c'est un son, on balance
 		if contentType == "audio/wave" {
-			extension = ".wav"
 			isNew, idMedia = startCompareSound("temp/" + file.Filename)
+			idMedia += ".wav"
 			fmt.Println(isNew, idMedia)
 		} else if contentType == "image/png" {
 			// Image treatment
 			log.Println("Going in")
 			fmt.Println(file.Filename)
-			extension = ".png"
 			isNew, idMedia = startCompareImage("temp/" + file.Filename)
 			isNew = !isNew
 			fmt.Println(isNew, idMedia)
 		} else if contentType == "image/jpg" || contentType == "image/jpeg" {
-			extension = ".jpg"
 			isNew, idMedia = startCompareImage("temp/" + file.Filename)
 			isNew = !isNew
 			fmt.Println(isNew, idMedia)
 		} else {
 			log.Println("Holy cucumber... What the fucker ?")
-			extension = ".fuck"
 		}
-
-		idMedia = idMedia + extension
 
 		// Store data
 		/// Delete temp file
@@ -71,7 +65,7 @@ func routeAddImage(c *gin.Context) {
 		/// Save file
 		if isNew {
 			println("Okay les gus, nouveau fichier")
-			c.SaveUploadedFile(file, "public/"+idMedia)
+			c.SaveUploadedFile(file, idMedia)
 		}
 
 		// Make JSON

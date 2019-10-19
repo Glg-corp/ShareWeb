@@ -17,7 +17,6 @@ type Image struct {
 	Path  string
 	Color uint32
 	Size  int32
-	Key   string
 }
 
 // sound table struct
@@ -26,7 +25,6 @@ type Sound struct {
 	Path      string
 	NbSamples int32
 	Mono      bool
-	Key       string
 }
 
 // fallback table struct
@@ -35,7 +33,6 @@ type Other struct {
 	Path      string
 	Extension string
 	FileSize  int32
-	Key       string
 }
 
 // init the database
@@ -244,16 +241,16 @@ func addExistingOther(other Other) {
 
 // Security  functions
 
-func isAllowed(mode string, path string, key string) bool {
-	var count int32
-	if mode == "image" {
-		db.Where(&Image{Path: path, Key: key}).Count(&count)
-	} else if mode == "sound" {
-		db.Where(&Sound{Path: path, Key: key}).Count(&count)
-	} else if mode == "other" {
-		db.Where(&Other{Path: path, Key: key}).Count(&count)
-	} else {
-		panic("Invalid mode >:c")
-	}
-	return count == 1
-}
+// func isAllowed(mode string, path string, key string) bool {
+// 	var count int32
+// 	if mode == "image" {
+// 		db.Where(&Image{Path: path}).Count(&count)
+// 	} else if mode == "sound" {
+// 		db.Where(&Sound{Path: path, Key: key}).Count(&count)
+// 	} else if mode == "other" {
+// 		db.Where(&Other{Path: path, Key: key}).Count(&count)
+// 	} else {
+// 		panic("Invalid mode >:c")
+// 	}
+// 	return count == 1
+// }

@@ -1,13 +1,14 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"math"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func startCompareImage(path string) (bool, string) {
@@ -41,6 +42,7 @@ func startCompareImage(path string) (bool, string) {
 
 	// create groups of means
 	var nbGroups uint32
+
 	nbGroups = 10000
 	finalMean /= (16777215 / nbGroups)
 
@@ -55,64 +57,72 @@ func startCompareImage(path string) (bool, string) {
 		size = 1
 	}
 
+	fmt.Println(finalMean)
+	fmt.Println(size)
+
 	// get images
 	images := getImages(finalMean, size)
 
 	for i := 0; i < len(images); i++ {
-		exists := compareImage(path, images[i].Path)
+		exists := compareImage(pixelsImage, images[i].Path)
 		if exists {
-			return true, strconv.Itoa(int(images[i].ID))
+			return true, images[i].Path
 		}
-    }
-    
-    id := getID("image")
-    
-    newName := fmt.Sprintf("./public/%d.%s", id, path[len(path)-3:])
+	}
 
-    addExistingImage(Image{Path: newName, Color: finalMean, Size: size, ID: id})
+	id := getID("image")
+
+	ext := strings.Split(path, ".")
+
+	extension := ext[len(ext)-1]
+
+	if extension == "jpeg" {
+		extension = "jpg"
+	}
+
+	newName := fmt.Sprintf("./public/%d.%s", id, extension)
+
+	addExistingImage(Image{Path: newName, Color: finalMean, Size: size, ID: id})
 
 	// if gets here, its false
-	return false, strconv.Itoa(int(id))
+	return false, newName
 }
 
-func compareImage(path1 string, path2 string) bool {
+func compareImage(pixelsImage1 [][]Pixel, path2 string) bool {
 
 	// Supported image formats
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
 
 	// Get the pixel arrays of the two images
-	pixelsImage1, err := getPixels(path1)
 	pixelsImage2, err := getPixels(path2)
 
+	width1 := len(pixelsImage1[0])
+	height1 := len(pixelsImage1)
+
+	width2 := len(pixelsImage2[0])
+	height2 := len(pixelsImage2)
+
+	// Handle error
 	if err != nil {
 		fmt.Println("Error: Image could not be decoded")
-		os.Exit(1)
+		return false
 	}
 
-	// If the two images don't have the same scale
-	if float64(len(pixelsImage1)) / float64(len(pixelsImage1[0])) != float64(len(pixelsImage2)) / float64(len(pixelsImage2[0])) {
+	// Check if the dimension is equal or not
+	if width1 != width2 && height1 != height2 {
 		return false
-	} else {
-
-		// If the two images have the same scale but are not the same size
-		if len(pixelsImage1) != len(pixelsImage2) {
-			//TODO
-			return false
-		}
 	}
 
 	// The two images are the same size
 	var nbPixelsEquivalent int
 	var counter int
-	width := len(pixelsImage1[0])
-	height := len(pixelsImage1)
 
 	// Size of the square pixel groups of which the mean will be computed (can be tweaked)
 	pixelSize := 10
 
-	for i := 0; i < height-height%pixelSize; i += pixelSize {
-		for j := 0; j < width-width%pixelSize; j += pixelSize {
+	for i := 0; i < height1 - height1 % pixelSize; i += pixelSize {
+		for j := 0; j < width1-width1%pixelSize; j += pixelSize {
 			counter++
 			if areTheSamePixels(computeMean(pixelSize, pixelSize, i, j, pixelsImage1).R, computeMean(pixelSize, pixelSize, i, j, pixelsImage1).G, computeMean(pixelSize, pixelSize, i, j, pixelsImage1).B, computeMean(pixelSize, pixelSize, i, j, pixelsImage2).R, computeMean(pixelSize, pixelSize, i, j, pixelsImage2).G, computeMean(pixelSize, pixelSize, i, j, pixelsImage2).B) {
 				nbPixelsEquivalent++
@@ -122,7 +132,6 @@ func compareImage(path1 string, path2 string) bool {
 
 	result := float64(nbPixelsEquivalent) / float64(counter) * 100 * 100
 	fmt.Println("The two images have a resemblance of", math.Round(result)/100, "%")
-
 
 	if result > 0.95 {
 		return true
