@@ -80,11 +80,10 @@ func doesImageExist(id int32) bool {
 }
 
 func getImages(color uint32, size int32) []Image {
-	now := time.Now().UnixNano()
 	// array := []Image{}
-
+	// TODO : utiliser make et pas un truc chelou avec append
 	// get the matching rows
-	rows, err := db.Where(&Image{Color: color, Size: size}).Model(&Image{}).Rows()
+	rows, err := db.Where("Color = ? and Size = ?", color, size).Model(&Image{}).Rows()
 	defer rows.Close()
 	if err != nil {
 		panic(err)
@@ -98,7 +97,6 @@ func getImages(color uint32, size int32) []Image {
 		db.ScanRows(rows, &image)
 		images = append(images, image)
 	}
-	fmt.Println("getImages !!! ", time.Now().UnixNano()-now)
 
 	return images
 

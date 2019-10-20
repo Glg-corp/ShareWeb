@@ -26,11 +26,9 @@ func startCompareImage(path string) (bool, string) {
 	height := len(pixelsImage)
 
 	// calculate the mean
-	now := time.Now().UnixNano()
 	mean := computeMeanSlow(height, width, 0, 0, pixelsImage)
-	fmt.Println("mmhhh: ", time.Now().UnixNano()-now)
 
-	hex := fmt.Sprintf("%X%X%X", int(mean.R/255), int(mean.G/255), int(mean.B/255))
+	hex := fmt.Sprintf("%X%X%X", int(mean.R/257), int(mean.G/257), int(mean.B/257))
 	temp, err := strconv.ParseUint(hex, 16, 32)
 
 	if err != nil {
@@ -38,7 +36,6 @@ func startCompareImage(path string) (bool, string) {
 	}
 
 	finalMean := uint32(temp)
-	fmt.Println(finalMean)
 
 	// create groups of means
 	var nbGroups uint32
@@ -59,6 +56,7 @@ func startCompareImage(path string) (bool, string) {
 
 	// get images
 	images := getImages(finalMean, size)
+
 
 	for i := 0; i < len(images); i++ {
 		exists := compareImage(pixelsImage, images[i].Path, width, height)
@@ -127,13 +125,9 @@ func compareImage(pixelsImage1 [][]Pixel, path2 string, width1 int, height1 int)
 
 // Get the bi-dimensional pixel array
 func getPixels(filePath string) ([][]Pixel, error) {
-	file, err := os.Open(filePath)
-	defer file.Close()
 
-	if err != nil {
-		panic(err)
-		os.Exit(1)
-	}
+	file, _ := os.Open(filePath)
+	defer file.Close()
 
 	img, _, err := image.Decode(file)
 
@@ -145,34 +139,34 @@ func getPixels(filePath string) ([][]Pixel, error) {
 	width, height := bounds.Max.X, bounds.Max.Y
 
 	pixels := make([][]Pixel, height)
-
+	
+	now := time.Now().UnixNano()
 	for y := 0; y < height; y++ {
 		row := make([]Pixel, width)
 		for x := 0; x < width; x++ {
-
 			row[x] = rgbaToPixel(img.At(x, y).RGBA())
-
 		}
 		pixels[y] = row
 	}
+	fmt.Println("Prêt à être spammé ? ", time.Now().UnixNano()-now)
 
 	return pixels, nil
 }
 
-// img.At(x, y).RGBA() returns four uint32 values; we want a Pixel
+// img.At(x, y).RGBA() returns four int values; we want a Pixel
 func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
-	return Pixel{r, g, b, a}
+	return Pixel{int(r), int(g), int(b), int(a)}
 }
 
 // Pixel struct example
 type Pixel struct {
-	R uint32
-	G uint32
-	B uint32
-	A uint32
+	R int
+	G int
+	B int
+	A int
 }
 
-func areTheSamePixels(r1 uint32, g1 uint32, b1 uint32, r2 uint32, g2 uint32, b2 uint32) bool {
+func areTheSamePixels(r1 int, g1 int, b1 int, r2 int, g2 int, b2 int) bool {
 	if abs(r1-r2) < 10 && abs(g1-g2) < 10 && abs(b1-b2) < 10 {
 		return true
 	}
@@ -180,7 +174,7 @@ func areTheSamePixels(r1 uint32, g1 uint32, b1 uint32, r2 uint32, g2 uint32, b2 
 
 }
 
-func abs(value uint32) uint32 {
+func abs(value int) int {
 	if value < 0 {
 		return -value
 	}
@@ -188,12 +182,12 @@ func abs(value uint32) uint32 {
 }
 
 func computeMean(side int, x int, y int, image [][]Pixel) Pixel {
-	var sumR uint32 = 0
-	var sumG uint32 = 0
-	var sumB uint32 = 0
-	var sumA uint32 = 0
+	var sumR int = 0
+	var sumG int = 0
+	var sumB int = 0
+	var sumA int = 0
 
-	var count uint32 = 1
+	var count int = 1
 
 	xWidth := x + side
 	yHeight := y + side
@@ -257,10 +251,10 @@ func computeMean(side int, x int, y int, image [][]Pixel) Pixel {
 
 func computeMeanSlow(width int, height int, x int, y int, image [][]Pixel) Pixel {
 
-	var sumR uint32 = 0
-	var sumG uint32 = 0
-	var sumB uint32 = 0
-	var sumA uint32 = 0
+	var sumR int = 0
+	var sumG int = 0
+	var sumB int = 0
+	var sumA int = 0
 
 	xWidth := x + width
 	yHeight := y + height
@@ -282,5 +276,5 @@ func computeMeanSlow(width int, height int, x int, y int, image [][]Pixel) Pixel
 		}
 	}
 
-	return Pixel{sumR / uint32(width*height), sumG / uint32(width*height), sumB / uint32(width*height), sumA / uint32(width*height)}
+	return Pixel{sumR / int(width*height), sumG / int(width*height), sumB / int(width*height), sumA / int(width*height)}
 }
