@@ -102,6 +102,7 @@ func compareImage(pixelsImage1 [][]Pixel, path2 string, width1 int, height1 int)
 	// Size of the square pixel groups of which the mean will be computed (can be tweaked)
 	pixelSize := 10
 
+	// for each group of pixel, check if it is equivalent to its counterpart of the other picture
 	for i := 0; i < height1-height1%pixelSize; i += pixelSize {
 		for j := 0; j < width1-width1%pixelSize; j += pixelSize {
 			counter++
@@ -139,6 +140,7 @@ func getPixels(filePath string) ([][]Pixel, error) {
 
 	pixels := make([][]Pixel, height / 2)
 
+	// for each pixel, add it to the array
 	for y := 0; y < height / 2; y++ {
 		row := make([]Pixel, width /2)
 		for x := 0; x < width / 2; x++ {
@@ -196,6 +198,7 @@ func computeMean(side int, x int, y int, image [][]Pixel) Pixel {
 		yHeight = len(image[0]) - 1
 	}
 
+	// compute the mean
 	for i := x; i < xWidth; i++ {
 		for j := 0; j < yHeight; j++ {
 			sumR += image[i][j].R
