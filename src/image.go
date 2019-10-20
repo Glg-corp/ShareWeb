@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
+	
 )
 
 func startCompareImage(path string) (bool, string) {
@@ -57,7 +57,6 @@ func startCompareImage(path string) (bool, string) {
 	// get images
 	images := getImages(finalMean, size)
 
-
 	for i := 0; i < len(images); i++ {
 		exists := compareImage(pixelsImage, images[i].Path, width, height)
 		if exists {
@@ -101,7 +100,7 @@ func compareImage(pixelsImage1 [][]Pixel, path2 string, width1 int, height1 int)
 	var counter int
 
 	// Size of the square pixel groups of which the mean will be computed (can be tweaked)
-	pixelSize := 40
+	pixelSize := 10
 
 	for i := 0; i < height1-height1%pixelSize; i += pixelSize {
 		for j := 0; j < width1-width1%pixelSize; j += pixelSize {
@@ -117,7 +116,7 @@ func compareImage(pixelsImage1 [][]Pixel, path2 string, width1 int, height1 int)
 	result := float32(nbPixelsEquivalent) / float32(counter) * 10000
 	// fmt.Println("The two images have a resemblance of", (result)/100, "%")
 
-	if result > 0.94 {
+	if result > 0.91 {
 		return true
 	}
 	return false
@@ -138,18 +137,15 @@ func getPixels(filePath string) ([][]Pixel, error) {
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
 
-	pixels := make([][]Pixel, height)
-	
-	now := time.Now().UnixNano()
-	for y := 0; y < height; y++ {
-		row := make([]Pixel, width)
-		for x := 0; x < width; x++ {
-			row[x] = rgbaToPixel(img.At(x, y).RGBA())
+	pixels := make([][]Pixel, height / 2)
+
+	for y := 0; y < height / 2; y++ {
+		row := make([]Pixel, width /2)
+		for x := 0; x < width / 2; x++ {
+			row[x] = rgbaToPixel(img.At(x * 2, y * 2).RGBA())
 		}
 		pixels[y] = row
 	}
-	fmt.Println("Prêt à être spammé ? ", time.Now().UnixNano()-now)
-
 	return pixels, nil
 }
 
