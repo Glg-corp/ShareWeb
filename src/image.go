@@ -198,7 +198,6 @@ func computeMean(side int, x int, y int, image [][]Pixel) Pixel {
 
 	for i := x; i < xWidth; i++ {
 		for j := 0; j < yHeight; j++ {
-			// On fait une pt1 de diagonale et balec
 			sumR += image[i][j].R
 			sumG += image[i][j].G
 			sumB += image[i][j].B
@@ -206,41 +205,6 @@ func computeMean(side int, x int, y int, image [][]Pixel) Pixel {
 			count++
 		}
 	}
-
-	/*for i := x; i < xWidth; i++ {
-		// up-left
-		sumR += image[x+i][y+i].R
-		sumG += image[x+i][y+i].G
-		sumB += image[x+i][y+i].B
-		sumA += image[x+i][y+i].A
-
-		// down-right
-		sumR += image[x + xWidth-i][y + yHeight-i].R
-		sumG += image[x + xWidth-i][y + yHeight-i].G
-		sumB += image[x + xWidth-i][y + yHeight-i].B
-		sumA += image[x + xWidth-i][y + yHeight-i].A
-
-		// UP - RIGHT
-		sumR += image[x + i][y + yHeight-i].R
-		sumG += image[x + i][y + yHeight-i].G
-		sumB += image[x + i][y + yHeight-i].B
-		sumA += image[x + i][y + yHeight-i].A
-
-		// DOWN-LEFT
-		sumR += image[x + xWidth-i][y + i].R
-		sumG += image[x + xWidth-i][y + i].G
-		sumB += image[x + xWidth-i][y + i].B
-		sumA += image[x + xWidth-i][y + i].A
-	}*/
-
-	// for i := x; i < xWidth; i++ {
-	// 	for j := y; j < yHeight; j++ {
-	// 		sumR += image[i][j].R
-	// 		sumG += image[i][j].G
-	// 		sumB += image[i][j].B
-	// 		sumA += image[i][j].A
-	// 	}
-	// }
 
 	return Pixel{sumR / count, sumB / count, sumG / count, sumG / count}
 }
